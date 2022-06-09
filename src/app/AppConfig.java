@@ -1,5 +1,9 @@
 package app;
 
+import app.model.Job;
+import app.model.Point;
+import app.model.ServentInfo;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,15 +27,7 @@ public class AppConfig {
 	 * Convenience access for this servent's information
 	 */
 	public static ServentInfo myServentInfo;
-	
-	private static List<ServentInfo> serventInfoList = new ArrayList<>();
 
-	/**
-	 * If this is true, the system is a clique - all nodes are each other's
-	 * neighbors. 
-	 */
-	public static boolean IS_CLIQUE;
-	
 	/**
 	 * Print a message to stdout with a timestamp
 	 * @param message message to print
@@ -53,7 +49,13 @@ public class AppConfig {
 		
 		System.err.println(timeFormat.format(now) + " - " + message);
 	}
-	
+
+	public static String BOOTSTRAP_IP_ADDRESS;
+	public static int BOOTSTRAP_PORT;
+
+	//todo trebace nam nesto nase umjesto cord state
+	//public static ChordState chordState;
+
 	/**
 	 * Reads a config file. Should be called once at start of app.
 	 * The config file should be of the following format:
@@ -79,92 +81,109 @@ public class AppConfig {
 	 * 
 	 * @param configName name of configuration file
 	 */
-	public static void readConfig(String configName){
+
+	public static void readBootstrapConfig(String configName){
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream(new File(configName)));
-			
+
 		} catch (IOException e) {
 			timestampedErrorPrint("Couldn't open properties file. Exiting...");
 			System.exit(0);
 		}
-		
-		int serventCount = -1;
+
+		BOOTSTRAP_IP_ADDRESS = properties.getProperty("bootstrap.ip");
 		try {
-			serventCount = Integer.parseInt(properties.getProperty("servent_count"));
+			BOOTSTRAP_PORT = Integer.parseInt(properties.getProperty("bootstrap.port"));
 		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading servent_count. Exiting...");
+			timestampedErrorPrint("Problem reading bootstrap_port. Exiting...");
 			System.exit(0);
 		}
-		
-		IS_CLIQUE = Boolean.parseBoolean(properties.getProperty("clique", "false"));
-		String snapshotType = properties.getProperty("snapshot");
-		if (snapshotType == null) {
-			snapshotType = "none";
+
+		//todo add
+		//ChordState.CHORD_SIZE = 64;
+
+		myServentInfo = new ServentInfo(BOOTSTRAP_IP_ADDRESS, BOOTSTRAP_PORT);
+	}
+
+	public static void readServentConfig(String configName, int serventId) {
+		Properties properties = new Properties();
+		try {
+			properties.load(new FileInputStream(new File(configName)));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			timestampedErrorPrint("Couldn't open properties file. Exiting...");
+			System.exit(0);
 		}
-		
-		for (int i = 0; i < serventCount; i++) {
-			String portProperty = "servent"+i+".port";
-			
-			int serventPort = -1;
-			
+
+		/*
+		ChordState.CHORD_SIZE = 64;
+		chordState = new ChordState();
+		 */
+
+		try {
+			String ipAddress = properties.getProperty("ip");
+			int listenerPort = Integer.parseInt(properties.getProperty("port"));
+
+			myServentInfo = new ServentInfo(ipAddress, listenerPort);
+		} catch (NumberFormatException e) {
+			timestampedErrorPrint("Problem reading ip_address or port. Exiting...");
+			System.exit(0);
+		}
+
+		BOOTSTRAP_IP_ADDRESS = properties.getProperty("bootstrap.ip");
+		try {
+			BOOTSTRAP_PORT = Integer.parseInt(properties.getProperty("bootstrap.port"));
+		} catch (NumberFormatException e) {
+			timestampedErrorPrint("Problem reading bootstrap_port. Exiting...");
+			System.exit(0);
+		}
+
+		try {
+			int weakFailureLimit = Integer.parseInt(properties.getProperty("weak_failure_limit"));
+			int strongFailureLimit = Integer.parseInt(properties.getProperty("strong_failure_limit"));
+
+			myServentInfo.setWeakFailureLimit(weakFailureLimit);
+			myServentInfo.setStrongFailureLimit(strongFailureLimit);
+		} catch (NumberFormatException e) {
+			timestampedErrorPrint("Problem reading ip_address or port. Exiting...");
+			System.exit(0);
+		}
+
+		if (properties.getProperty("job_count") == null) {
+			return;
+		}
+
+		int jobsCount = Integer.parseInt(properties.getProperty("job_count"));
+		for (int i = 0; i < jobsCount; i++) {
+			String jobName = properties.getProperty("job" + i + ".name");
+
+			String[] pointsCoordinates = properties.getProperty("job" + i + ".points.coordinates").split(";");
+			List<Point> points = new ArrayList<>();
 			try {
-				serventPort = Integer.parseInt(properties.getProperty(portProperty));
+				for (String coordinates: pointsCoordinates) {
+					String[] xy = coordinates.substring(1, coordinates.length() - 1).split(",");
+					points.add(new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
+				}
 			} catch (NumberFormatException e) {
-				timestampedErrorPrint("Problem reading " + portProperty + ". Exiting...");
+				timestampedErrorPrint("Problem reading points for the job. Exiting...");
 				System.exit(0);
 			}
-			
-			List<Integer> neighborList = new ArrayList<>();
-			if (IS_CLIQUE) {
-				for(int j = 0; j < serventCount; j++) {
-					if (j == i) {
-						continue;
-					}
-					
-					neighborList.add(j);
-				}
-			} else {
-				String neighborListProp = properties.getProperty("servent"+i+".neighbors");
-				
-				if (neighborListProp == null) {
-					timestampedErrorPrint("Warning: graph is not clique, and node " + i + " doesnt have neighbors");
-				} else {
-					String[] neighborListArr = neighborListProp.split(",");
-					
-					try {
-						for (String neighbor : neighborListArr) {
-							neighborList.add(Integer.parseInt(neighbor));
-						}
-					} catch (NumberFormatException e) {
-						timestampedErrorPrint("Bad neighbor list for node " + i + ": " + neighborListProp);
-					}
-				}
+
+			try {
+				int pointsCount = Integer.parseInt(properties.getProperty("job" + i + ".points.count"));
+				double proportion = Double.parseDouble(properties.getProperty("job" + i + ".proportion"));
+				int width = Integer.parseInt(properties.getProperty("job" + i + ".width"));
+				int height = Integer.parseInt(properties.getProperty("job" + i + ".height"));
+
+				Job job = new Job(jobName, pointsCount, proportion, width, height, points);
+				myServentInfo.addNewJob(job);
+			} catch (NumberFormatException e) {
+				timestampedErrorPrint("Problem reading integer or double properties for the job. Exiting...");
+				System.exit(0);
 			}
-			
-			ServentInfo newInfo = new ServentInfo("localhost", i, serventPort, neighborList);
-			serventInfoList.add(newInfo);
 		}
 	}
-	
-	/**
-	 * Get info for a servent selected by a given id.
-	 * @param id id of servent to get info for
-	 * @return {@link ServentInfo} object for this id
-	 */
-	public static ServentInfo getInfoById(int id) {
-		if (id >= getServentCount()) {
-			throw new IllegalArgumentException(
-					"Trying to get info for servent " + id + " when there are " + getServentCount() + " servents.");
-		}
-		return serventInfoList.get(id);
-	}
-	
-	/**
-	 * Get number of servents in this system.
-	 */
-	public static int getServentCount() {
-		return serventInfoList.size();
-	}
-	
+
 }

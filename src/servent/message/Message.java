@@ -3,7 +3,7 @@ package servent.message;
 import java.io.Serializable;
 import java.util.List;
 
-import app.ServentInfo;
+import app.model.ServentInfo;
 
 /**
  * This is your basic message. It should cover most needs.
@@ -39,12 +39,6 @@ public interface Message extends Serializable {
 	ServentInfo getOriginalSenderInfo();
 	
 	/**
-	 * If a servent uses <code>makeMeASender</code> when resending a message, it will
-	 * be added to this list. So we can use this to see how this message got to us.
-	 */
-	List<ServentInfo> getRoute();
-	
-	/**
 	 * Information about the receiver of the message.
 	 */
 	ServentInfo getReceiverInfo();
@@ -64,18 +58,6 @@ public interface Message extends Serializable {
 	 * in the system.
 	 */
 	int getMessageId();
-
-	/**
-	 * Alters the message and returns a new copy with everything intact, except
-	 * the current node being added to the route list.
-	 */
-	Message makeMeASender();
-	
-	/**
-	 * Alters the message and returns a new copy with everything intact, except
-	 * the receiver being changed to the one with the specified <code>id</code>.
-	 */
-	Message changeReceiver(Integer newReceiverId);
 	
 	/**
 	 * This method is invoked by the frameworks sender code. It is invoked

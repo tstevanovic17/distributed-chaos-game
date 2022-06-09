@@ -1,7 +1,10 @@
 package app;
 
+import app.model.Job;
 import cli.CLIParser;
 import servent.SimpleServentListener;
+
+import java.util.List;
 
 /**
  * Describes the procedure for starting a single Servent
@@ -24,23 +27,17 @@ public class ServentMain {
 		int portNumber = -1;
 		
 		String serventListFile = args[0];
-		
-		AppConfig.readConfig(serventListFile);
-		
+
 		try {
 			serventId = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
+			e.printStackTrace();
 			AppConfig.timestampedErrorPrint("Second argument should be an int. Exiting...");
 			System.exit(0);
 		}
-		
-		if (serventId >= AppConfig.getServentCount()) {
-			AppConfig.timestampedErrorPrint("Invalid servent id provided");
-			System.exit(0);
-		}
-		
-		AppConfig.myServentInfo = AppConfig.getInfoById(serventId);
-		
+
+		AppConfig.readServentConfig(serventListFile, serventId);
+
 		try {
 			portNumber = AppConfig.myServentInfo.getListenerPort();
 			
@@ -53,7 +50,16 @@ public class ServentMain {
 		}
 		
 		AppConfig.timestampedStandardPrint("Starting servent " + AppConfig.myServentInfo);
-		
+
+		List<Job> serventJobs = AppConfig.myServentInfo.getJobs();
+
+		if (!serventJobs.isEmpty()) {
+			AppConfig.timestampedStandardPrint("Listing servent jobs:");
+			for (Job serventJob : serventJobs) {
+				AppConfig.timestampedStandardPrint("Job name: " + serventJob.getName());
+			}
+		}
+
 		SimpleServentListener simpleListener = new SimpleServentListener();
 		Thread listenerThread = new Thread(simpleListener);
 		listenerThread.start();
@@ -61,6 +67,10 @@ public class ServentMain {
 		CLIParser cliParser = new CLIParser(simpleListener);
 		Thread cliThread = new Thread(cliParser);
 		cliThread.start();
-		
+
+		ServentInitializer serventInitializer = new ServentInitializer();
+		Thread initializerThread = new Thread(serventInitializer);
+		initializerThread.start();
+
 	}
 }

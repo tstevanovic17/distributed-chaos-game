@@ -5,7 +5,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import app.AppConfig;
-import app.ServentInfo;
+import app.model.ServentInfo;
 import servent.message.Message;
 
 /**

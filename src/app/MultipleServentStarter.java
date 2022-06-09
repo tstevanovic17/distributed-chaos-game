@@ -65,36 +65,34 @@ public class MultipleServentStarter {
 	private static void startServentTest(String testName) {
 		List<Process> serventProcesses = new ArrayList<>();
 		
-		AppConfig.readConfig(testName+"/servent_list.properties");
+		AppConfig.readBootstrapConfig(testName+"/servent_list.properties");
 		
 		AppConfig.timestampedStandardPrint("Starting multiple servent runner. "
 				+ "If servents do not finish on their own, type \"stop\" to finish them");
-		
-		int serventCount = AppConfig.getServentCount();
 
+		Process bsProcess = null;
+		ProcessBuilder bsBuilder = new ProcessBuilder("java", "-cp", "/Users/uroskekovic/Desktop/DoraZavrsniProjekat/distributed-chaos-game-master/target/classes", "app.BootstrapServer",
+				String.valueOf(AppConfig.BOOTSTRAP_PORT));
+		try {
+			//We use files to read and write.
+			//System.out, System.err and System.in will point to these files.
+			bsBuilder.redirectOutput(new File(testName+"/output/bootstrap" + "_out.txt"));
+			bsBuilder.redirectError(new File(testName+"/error/bootstrap" + "_err.txt"));
 
-		for(int i = 0; i < serventCount; i++) {
-			try {
-				ProcessBuilder builder = new ProcessBuilder("java", "-cp", "out\\production\\KiDS-vezbe10-Sofija", "app.ServentMain",
-						testName+"/servent_list.properties", String.valueOf(i));
-				
-				//We use files to read and write.
-				//System.out, System.err and System.in will point to these files.
-				builder.redirectOutput(new File(testName+"/output/servent" + i + "_out.txt"));
-				builder.redirectError(new File(testName+"/error/servent" + i + "_err.txt"));
-				builder.redirectInput(new File(testName+"/input/servent" + i + "_in.txt"));
-				
-				//Starts the servent as a completely separate process.
-				Process p = builder.start();
-				serventProcesses.add(p);
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			bsProcess = bsBuilder.start();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		
-		Thread t = new Thread(new ServentCLI(serventProcesses));
-		
+
+		//wait for bootstrap to start
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		Thread t = new Thread(new ServentCLI(serventProcesses, bsProcess));
+
 		t.start(); //CLI thread waiting for user to type "stop".
 		
 		for (Process process : serventProcesses) {

@@ -32,39 +32,18 @@ import app.model.ServentInfo;
  */
 public interface Message extends Serializable {
 
-	/**
-	 * Information about the original sender. If <code>makeMeASender</code> is invoked
-	 * on this object, this attribute will not be changed.
-	 */
-	ServentInfo getOriginalSenderInfo();
-	
-	/**
-	 * Information about the receiver of the message.
-	 */
-	ServentInfo getReceiverInfo();
-	
-	/**
-	 * Message type. Mainly used to decide which handler will work on this message.
-	 */
 	MessageType getMessageType();
-	
-	/**
-	 * The body of the message. Use this to see what your neighbors have sent you.
-	 */
+
 	String getMessageText();
-	
-	/**
-	 * An id that is unique per servent. Combined with servent id, it will be unique
-	 * in the system.
-	 */
+
 	int getMessageId();
-	
-	/**
-	 * This method is invoked by the frameworks sender code. It is invoked
-	 * exactly before the message is being sent. If the message was held up
-	 * by an event or a queue, this ensures that we perform the effect as
-	 * we are sending the message.
-	 */
-	void sendEffect();
+
+	int getSenderPort();
+
+	String getSenderIp();
+
+	int getReceiverPort();
+
+	String getReceiverIp();
 	
 }

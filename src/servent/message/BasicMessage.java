@@ -3,8 +3,6 @@ package servent.message;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import app.model.ServentInfo;
-
 /**
  * A default message implementation. This should cover most situations.
  * If you want to add stuff, remember to think about the modificator methods.
@@ -18,50 +16,17 @@ public class BasicMessage implements Message {
 	private final MessageType type;
 	private final int senderPort;
 	private final int receiverPort;
-	private final ServentInfo originalSenderInfo;
-	private final ServentInfo receiverInfo;
+	private final String senderIp;
+	private final String receiverIp;
 	private final String messageText;
 	
 	//This gives us a unique id - incremented in every natural constructor.
-	private static AtomicInteger messageCounter = new AtomicInteger(0);
+	private static final AtomicInteger messageCounter = new AtomicInteger(0);
 	private final int messageId;
-	
-	public BasicMessage(MessageType type, int receiverPort, int senderPort, ServentInfo originalSenderInfo, ServentInfo receiverInfo) {
-		this.type = type;
-		this.receiverPort = receiverPort;
-		this.senderPort = senderPort;
-		this.originalSenderInfo = originalSenderInfo;
-		this.receiverInfo = receiverInfo;
-		this.messageText = "";
-		
-		this.messageId = messageCounter.getAndIncrement();
-	}
-	
-	public BasicMessage(MessageType type, int receiverPort, int senderPort, ServentInfo originalSenderInfo, ServentInfo receiverInfo,
-						String messageText) {
-		this.type = type;
-		this.receiverPort = receiverPort;
-		this.senderPort = senderPort;
-		this.originalSenderInfo = originalSenderInfo;
-		this.receiverInfo = receiverInfo;
-		this.messageText = messageText;
-		
-		this.messageId = messageCounter.getAndIncrement();
-	}
-	
+
 	@Override
 	public MessageType getMessageType() {
 		return type;
-	}
-
-	@Override
-	public ServentInfo getOriginalSenderInfo() {
-		return originalSenderInfo;
-	}
-
-	@Override
-	public ServentInfo getReceiverInfo() {
-		return receiverInfo;
 	}
 
 	@Override
@@ -82,16 +47,34 @@ public class BasicMessage implements Message {
 		return receiverPort;
 	}
 
-	protected BasicMessage(MessageType type, int receiverPort, int senderPort, ServentInfo originalSenderInfo, ServentInfo receiverInfo,
-						   String messageText, int messageId) {
+	public MessageType getType() {
+		return type;
+	}
+
+	public String getSenderIp() {
+		return senderIp;
+	}
+
+	public String getReceiverIp() {
+		return receiverIp;
+	}
+
+	protected BasicMessage(
+			MessageType type,
+			int senderPort,
+			String senderIp,
+			int receiverPort,
+			String receiverIp,
+			String messageText
+	) {
 		this.type = type;
 		this.receiverPort = receiverPort;
 		this.senderPort = senderPort;
-		this.originalSenderInfo = originalSenderInfo;
-		this.receiverInfo = receiverInfo;
+		this.senderIp = senderIp;
+		this.receiverIp = receiverIp;
 		this.messageText = messageText;
 		
-		this.messageId = messageId;
+		this.messageId = messageCounter.getAndIncrement();
 	}
 
 	/**
@@ -103,7 +86,8 @@ public class BasicMessage implements Message {
 			BasicMessage other = (BasicMessage)obj;
 
 			return getMessageId() == other.getMessageId() &&
-					getOriginalSenderInfo().getId() == other.getOriginalSenderInfo().getId();
+					getSenderPort() == other.getSenderPort() &&
+					getSenderIp().equals(other.getSenderIp());
 		}
 		
 		return false;
@@ -115,7 +99,7 @@ public class BasicMessage implements Message {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(getMessageId(), getOriginalSenderInfo().getId());
+		return Objects.hash(getMessageId(), getSenderPort());
 	}
 	
 	/**
@@ -123,16 +107,15 @@ public class BasicMessage implements Message {
 	 */
 	@Override
 	public String toString() {
-		return "[" + getOriginalSenderInfo().getId() + "|" + getMessageId() + "|" +
-					getMessageText() + "|" + getMessageType() + "|" +
-					getReceiverInfo().getId() + "]";
+		return "BasicMessage{" +
+				"type=" + type +
+				", senderPort=" + senderPort +
+				", receiverPort=" + receiverPort +
+				", senderIp='" + senderIp + '\'' +
+				", receiverIp='" + receiverIp + '\'' +
+				", messageText='" + messageText + '\'' +
+				", messageId=" + messageId +
+				'}';
 	}
 
-	/**
-	 * Empty implementation, which will be suitable for most messages.
-	 */
-	@Override
-	public void sendEffect() {
-		
-	}
 }

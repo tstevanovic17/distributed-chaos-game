@@ -50,11 +50,24 @@ public class ServentInitializer implements Runnable {
 			//AppConfig.chordState.getAllNodeIdInfoMap().put(AppConfig.myServentInfo.getId(), AppConfig.myServentInfo);
 			AppConfig.timestampedStandardPrint("First node in distributed chaos-game system.");
 		} else { //bootstrap gave us something else - let that node tell our successor that we are here
-			NewNodeMessage nnm = new NewNodeMessage(AppConfig.myServentInfo.getListenerPort(),
-					Integer.parseInt(lastServent.split(":")[1]), AppConfig.myServentInfo.getIpAddress(),
-					lastServent.split(":")[0], firstServent);
-			MessageUtil.sendMessage(nnm);
+			try {
+				String[] lastServentIpAndPort = lastServent.split(":");
+				int lastServentPort = Integer.parseInt(lastServentIpAndPort[1]);
+				String lastServentIp = lastServentIpAndPort[0];
+
+				NewNodeMessage nnm = new NewNodeMessage(
+						AppConfig.myServentInfo.getListenerPort(),
+						AppConfig.myServentInfo.getIpAddress(),
+						lastServentPort,
+						lastServentIp
+				);
+
+				MessageUtil.sendMessage(nnm);
+			} catch (Exception e) {
+				AppConfig.timestampedErrorPrint("Bad last servent data");
+			}
 		}
+
 	}
 
 }

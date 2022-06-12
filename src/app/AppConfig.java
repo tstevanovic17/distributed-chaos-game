@@ -28,6 +28,9 @@ public class AppConfig {
 	 */
 	public static ServentInfo myServentInfo;
 
+	//initialized in welcome message
+	public static SystemState systemState;
+
 	/**
 	 * Print a message to stdout with a timestamp
 	 * @param message message to print

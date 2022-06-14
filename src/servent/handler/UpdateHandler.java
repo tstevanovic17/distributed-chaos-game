@@ -36,14 +36,14 @@ public class UpdateHandler implements MessageHandler {
                 //cvor koji je ukljucio novog cvora je dobio poruku
 
                 //dopunjavamo listu cvorova za koje znamo i saljemo svim cvorovima update
-                AppConfig.systemState.setServentInfoMap(message.getServentList());
+                AppConfig.systemState.setServentInfoMap(message.getServentInfoMap());
 
                 UpdateMessage reply = new UpdateMessage(
                         clientMessage.getReceiverPort(),
                         clientMessage.getReceiverIp(),
                         clientMessage.getSenderPort(),
                         clientMessage.getSenderIp(),
-                        (List<ServentInfo>) AppConfig.systemState.getServentInfoMap().values(),
+                        AppConfig.systemState.getServentInfoMap(),
                         AppConfig.systemState.getServentsJobsMap(),
                         AppConfig.systemState.getSystemActiveJobs(),
                         false
@@ -54,8 +54,13 @@ public class UpdateHandler implements MessageHandler {
             } else {
                 //ostali cvorovi ukljucujuci i novi cvor su dobili poruku sa svim inormacijama iz sistema
                 AppConfig.systemState.setSystemActiveJobs(message.getJobs());
-                AppConfig.systemState.setServentInfoMap(message.getServentList());
+                AppConfig.systemState.setServentInfoMap(message.getServentInfoMap());
                 AppConfig.systemState.setServentsJobsMap(message.getServentsJobsMap());
+
+                if (message.getJobs().size() > 0) {
+                    //imali smo poslove koji se izvrsavaju, moramo da ih prerasporedimo
+                    //todo vrati se na ovo
+                }
             }
 
         } else {

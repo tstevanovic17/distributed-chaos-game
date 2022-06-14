@@ -90,9 +90,6 @@ public class BootstrapServer {
 						// send last servent
 						String lastServent = activeServents.get(activeServents.size() - 1);
 						socketWriter.write(lastServent + "\n");
-						// send info of 0 servent
-						String fisrtServent = activeServents.get(0);
-						socketWriter.write(fisrtServent + "\n");
 					}
 					
 					socketWriter.flush();

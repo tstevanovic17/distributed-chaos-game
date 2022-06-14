@@ -11,7 +11,7 @@ public class UpdateMessage extends BasicMessage {
 
 	private static final long serialVersionUID = 3586102505319194978L;
 
-	private final List<ServentInfo> serventList;
+	private final Map<Integer, ServentInfo> serventInfoMap;
 	private final Map<Integer, Fractal> serventsJobsMap;
 	private final List<Job> jobs;
 	private final boolean shouldReply;
@@ -21,21 +21,21 @@ public class UpdateMessage extends BasicMessage {
 			String senderIp,
 			int receiverPort,
 			String receiverIp,
-			List<ServentInfo> serventList,
+			Map<Integer, ServentInfo> serventInfoMap,
 			Map<Integer, Fractal> serventsJobsMap,
 			List<Job> jobs,
 			boolean shouldReply
 	) {
 		super(MessageType.UPDATE, senderPort, senderIp, receiverPort, receiverIp, "");
 
-		this.serventList = serventList;
+		this.serventInfoMap = serventInfoMap;
 		this.serventsJobsMap = serventsJobsMap;
 		this.jobs = jobs;
 		this.shouldReply = shouldReply;
 	}
 
-	public List<ServentInfo> getServentList() {
-		return serventList;
+	public Map<Integer, ServentInfo> getServentInfoMap() {
+		return serventInfoMap;
 	}
 
 	public Map<Integer, Fractal> getServentsJobsMap() {

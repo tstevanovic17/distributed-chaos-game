@@ -65,13 +65,13 @@ public class MultipleServentStarter {
 	private static void startServentTest(String testName) {
 		List<Process> serventProcesses = new ArrayList<>();
 		
-		AppConfig.readBootstrapConfig(testName+"/servent_list.properties");
+		AppConfig.readBootstrapConfig(testName+"/bootstrap.properties");
 		
 		AppConfig.timestampedStandardPrint("Starting multiple servent runner. "
 				+ "If servents do not finish on their own, type \"stop\" to finish them");
 
 		Process bsProcess = null;
-		ProcessBuilder bsBuilder = new ProcessBuilder("java", "-cp", "/Users/uroskekovic/Desktop/DoraZavrsniProjekat/distributed-chaos-game-master/target/classes", "app.BootstrapServer",
+		ProcessBuilder bsBuilder = new ProcessBuilder("java", "-cp", "out/production/KiDS-vezbe10-Sofija", "app.BootstrapServer",
 				String.valueOf(AppConfig.BOOTSTRAP_PORT));
 		try {
 			//We use files to read and write.
@@ -107,7 +107,7 @@ public class MultipleServentStarter {
 	}
 	
 	public static void main(String[] args) {
-		startServentTest("ly_snapshot");
+		startServentTest("game");
 		
 	}
 

@@ -5,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import app.AppConfig;
-import app.model.ServentInfo;
 import servent.message.Message;
 
 /**
@@ -17,7 +16,7 @@ import servent.message.Message;
  */
 public class DelayedMessageSender implements Runnable {
 
-	private Message messageToSend;
+	private final Message messageToSend;
 	
 	public DelayedMessageSender(Message messageToSend) {
 		this.messageToSend = messageToSend;
@@ -34,23 +33,21 @@ public class DelayedMessageSender implements Runnable {
 			e1.printStackTrace();
 		}
 		
-		ServentInfo receiverInfo = messageToSend.getReceiverInfo();
-		
 		if (MessageUtil.MESSAGE_UTIL_PRINTING) {
 			AppConfig.timestampedStandardPrint("Sending message " + messageToSend);
 		}
 		
 		try {
-			Socket sendSocket = new Socket(receiverInfo.getIpAddress(), receiverInfo.getListenerPort());
+			Socket sendSocket = new Socket(messageToSend.getReceiverIp(), messageToSend.getReceiverPort());
 			
 			ObjectOutputStream oos = new ObjectOutputStream(sendSocket.getOutputStream());
 			oos.writeObject(messageToSend);
 			oos.flush();
 			
 			sendSocket.close();
-			
-			messageToSend.sendEffect();
+
 		} catch (IOException e) {
+			e.printStackTrace();
 			AppConfig.timestampedErrorPrint("Couldn't send message: " + messageToSend.toString());
 		}
 	}

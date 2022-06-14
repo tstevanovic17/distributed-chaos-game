@@ -69,8 +69,8 @@ public class BasicMessage implements Message {
 	) {
 		this.type = type;
 		this.receiverPort = receiverPort;
-		this.senderPort = senderPort;
 		this.senderIp = senderIp;
+		this.senderPort = senderPort;
 		this.receiverIp = receiverIp;
 		this.messageText = messageText;
 		

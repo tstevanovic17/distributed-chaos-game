@@ -46,14 +46,16 @@ public class ServentInitializer implements Runnable {
 		}
 		if (lastServent.equals("-1")) { //bootstrap gave us -1 -> we are first
 			AppConfig.myServentInfo.setId(0);
-			//todo upisati nas u nesto kao cordstate
-			//AppConfig.chordState.getAllNodeIdInfoMap().put(AppConfig.myServentInfo.getId(), AppConfig.myServentInfo);
+			AppConfig.systemState.initializeSystemState(AppConfig.myServentInfo);
+			AppConfig.systemState.getServentInfoMap().put(AppConfig.myServentInfo.getId(), AppConfig.myServentInfo);
 			AppConfig.timestampedStandardPrint("First node in distributed chaos-game system.");
 		} else { //bootstrap gave us something else - let that node tell our successor that we are here
 			try {
 				String[] lastServentIpAndPort = lastServent.split(":");
 				int lastServentPort = Integer.parseInt(lastServentIpAndPort[1]);
 				String lastServentIp = lastServentIpAndPort[0];
+
+				System.out.println("Last servent prot: " + lastServentPort);
 
 				NewNodeMessage nnm = new NewNodeMessage(
 						AppConfig.myServentInfo.getListenerPort(),

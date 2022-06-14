@@ -36,7 +36,7 @@ public class ServentMain {
 			System.exit(0);
 		}
 
-		AppConfig.readServentConfig(serventListFile, serventId);
+		AppConfig.readServentConfig(serventListFile);
 
 		try {
 			portNumber = AppConfig.myServentInfo.getListenerPort();

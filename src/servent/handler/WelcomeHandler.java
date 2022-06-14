@@ -9,6 +9,8 @@ import servent.message.UpdateMessage;
 import servent.message.WelcomeMessage;
 import servent.message.util.MessageUtil;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class WelcomeHandler implements MessageHandler {
@@ -27,19 +29,28 @@ public class WelcomeHandler implements MessageHandler {
 
 			AppConfig.myServentInfo.setId(welcomeMsg.getNewServentId());
 
-			AppConfig.systemState = new SystemState(AppConfig.myServentInfo);
+			System.out.println("welcome poruku je dobio: "+AppConfig.myServentInfo.getId());
+
+			AppConfig.systemState.initializeSystemState(AppConfig.myServentInfo);
+
+			System.out.println("update should be sent 1");
 
 			UpdateMessage updateMessage = new UpdateMessage(
 					AppConfig.myServentInfo.getListenerPort(),
 					AppConfig.myServentInfo.getIpAddress(),
 					welcomeMsg.getSenderPort(),
 					welcomeMsg.getSenderIp(),
-					(List<ServentInfo>) AppConfig.systemState.getServentInfoMap().values(),
-					null,
-					null,
+					AppConfig.systemState.getServentInfoMap(),
+					new HashMap<>(),
+					new ArrayList<>(),
 					true
 			);
+
+			System.out.println("update should be sent 2");
+
 			MessageUtil.sendMessage(updateMessage);
+
+			System.out.println("update should be sent 3");
 			
 		} else {
 			AppConfig.timestampedErrorPrint("Welcome handler got a message that is not WELCOME");

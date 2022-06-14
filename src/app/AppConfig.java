@@ -92,6 +92,7 @@ public class AppConfig {
 
 		} catch (IOException e) {
 			timestampedErrorPrint("Couldn't open properties file. Exiting...");
+			e.printStackTrace();
 			System.exit(0);
 		}
 
@@ -103,13 +104,11 @@ public class AppConfig {
 			System.exit(0);
 		}
 
-		//todo add
-		//ChordState.CHORD_SIZE = 64;
 
 		myServentInfo = new ServentInfo(BOOTSTRAP_IP_ADDRESS, BOOTSTRAP_PORT);
 	}
 
-	public static void readServentConfig(String configName, int serventId) {
+	public static void readServentConfig(String configName) {
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream(new File(configName)));
@@ -120,10 +119,7 @@ public class AppConfig {
 			System.exit(0);
 		}
 
-		/*
-		ChordState.CHORD_SIZE = 64;
-		chordState = new ChordState();
-		 */
+		systemState = new SystemState();
 
 		try {
 			String ipAddress = properties.getProperty("ip");

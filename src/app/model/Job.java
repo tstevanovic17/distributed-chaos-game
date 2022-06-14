@@ -1,9 +1,10 @@
 package app.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class Job {
+public class Job implements Serializable {
 
     private final String name;
     private final int pointsCount;

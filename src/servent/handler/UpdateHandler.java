@@ -1,9 +1,8 @@
 package servent.handler;
 
-import java.util.List;
-
 import app.AppConfig;
-import app.model.ServentInfo;
+import app.JobScheduler;
+import servent.message.RescheduleJobMessage;
 import servent.message.Message;
 import servent.message.MessageType;
 import servent.message.UpdateMessage;
@@ -11,7 +10,7 @@ import servent.message.util.MessageUtil;
 
 public class UpdateHandler implements MessageHandler {
 
-    private UpdateMessage clientMessage;
+    private final UpdateMessage clientMessage;
 
     public UpdateHandler(Message clientMessage) {
         this.clientMessage = (UpdateMessage) clientMessage;
@@ -58,8 +57,17 @@ public class UpdateHandler implements MessageHandler {
                 AppConfig.systemState.setServentsJobsMap(message.getServentsJobsMap());
 
                 if (message.getJobs().size() > 0) {
-                    //imali smo poslove koji se izvrsavaju, moramo da ih prerasporedimo
-                    //todo vrati se na ovo
+                    AppConfig.timestampedStandardPrint("Rescheduling jobs");
+
+                    RescheduleJobMessage jsm = new RescheduleJobMessage(
+                            AppConfig.myServentInfo.getListenerPort(),
+                            AppConfig.myServentInfo.getIpAddress(),
+                            AppConfig.myServentInfo.getListenerPort(),
+                            AppConfig.myServentInfo.getIpAddress(),
+                            JobScheduler.JobScheduleReason.JOB_REMOVED
+                    );
+
+                    MessageUtil.sendMessage(jsm);
                 }
             }
 

@@ -1,7 +1,7 @@
 package servent.handler;
 
 import app.AppConfig;
-import app.ImageUtil;
+import app.SaveResultsImage;
 import app.model.Point;
 import servent.message.JobResultMessage;
 import servent.message.Message;
@@ -32,6 +32,6 @@ public class JobResultHandler implements MessageHandler {
         double proportion = jobResultMessage.getProportion();
 
 
-        ImageUtil.renderImage(jobName, jobResultMessage.getFractalId(), width, height, proportion, resultPoints);
+        SaveResultsImage.saveResultsImage(jobName, jobResultMessage.getFractalId(), width, height, proportion, resultPoints);
     }
 }

@@ -9,11 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class ImageUtil {
+public class SaveResultsImage {
 
-    public static void renderImage(
-            String jobName,
-            String fractalID,
+    public static void saveResultsImage(
+            String job,
+            String fractal,
             int width,
             int height,
             double proportion,
@@ -27,19 +27,24 @@ public class ImageUtil {
             writableRaster.setPixel(p.getCoordX(), p.getCoordY(), rgb);
         }
 
-        BufferedImage newImage = new BufferedImage(writableRaster.getWidth(), writableRaster.getHeight(),
-                BufferedImage.TYPE_3BYTE_BGR);
-        newImage.setData(writableRaster);
+        BufferedImage imageToSave = new BufferedImage(
+                writableRaster.getWidth(),
+                writableRaster.getHeight(),
+                BufferedImage.TYPE_3BYTE_BGR
+        );
+
+        imageToSave.setData(writableRaster);
         try {
-            if (fractalID != null) {
-                ImageIO.write(newImage, "PNG", new File("fractals/" + jobName + fractalID + "_" + proportion + ".png"));
+            if (fractal != null) {
+                ImageIO.write(imageToSave, "PNG", new File("fractals/" + job + fractal + "_" + proportion + ".png"));
             } else {
-                ImageIO.write(newImage, "PNG", new File("fractals/" + jobName + "_" + proportion + ".png"));
+                ImageIO.write(imageToSave, "PNG", new File("fractals/" + job + "_" + proportion + ".png"));
             }
-            AppConfig.timestampedStandardPrint("Fractal image rendered.");
+            AppConfig.timestampedStandardPrint("Image rendered successfully.");
         } catch (IOException e) {
-            AppConfig.timestampedErrorPrint(e.getMessage());
+            AppConfig.timestampedErrorPrint("Failed to render image");
             e.printStackTrace();
         }
     }
+
 }

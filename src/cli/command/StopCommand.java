@@ -4,7 +4,7 @@ import app.AppConfig;
 import app.JobScheduler;
 import app.model.Job;
 import app.model.ServentInfo;
-import servent.message.JobScheduleMessage;
+import servent.message.RescheduleJobMessage;
 import servent.message.StopJobMessage;
 import servent.message.util.MessageUtil;
 
@@ -50,14 +50,17 @@ public class StopCommand implements CLICommand {
 
 				AppConfig.timestampedStandardPrint("Rescheduling jobs");
 
-				JobScheduleMessage jsm = new JobScheduleMessage(
+				RescheduleJobMessage jsm = new RescheduleJobMessage(
 						AppConfig.myServentInfo.getListenerPort(),
 						AppConfig.myServentInfo.getIpAddress(),
 						AppConfig.myServentInfo.getListenerPort(),
 						AppConfig.myServentInfo.getIpAddress(),
 						JobScheduler.JobScheduleReason.JOB_REMOVED
 				);
+
+				MessageUtil.sendMessage(jsm);
 			}
+
 
 		} else {
 			AppConfig.timestampedErrorPrint("Job not found.");

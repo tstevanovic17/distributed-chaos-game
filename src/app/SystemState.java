@@ -42,7 +42,6 @@ public class SystemState {
         }
     }
 
-    //todo ovo se nedje duplo poziva
     public boolean addJob(Job newJob) {
         if(systemActiveJobs.contains(newJob)) {
             return false;
@@ -52,23 +51,24 @@ public class SystemState {
         }
     }
 
-    public void removeJob(String jobName) {
-        for (Job job: systemActiveJobs) {
-            if (job.getName().equals(jobName)) {
-                systemActiveJobs.remove(job);
-                break;
-            }
-        }
+    public void clearJobFromSystemState(String jobName) {
 
         List<Integer> ids = new ArrayList<>();
-        for (Map.Entry<Integer, Fractal> entry: serventsJobsMap.entrySet()) {
-            if (entry.getValue().getJob().equals(jobName)) {
-                ids.add(entry.getKey());
+        for (Map.Entry<Integer, Fractal> i: serventsJobsMap.entrySet()) {
+            if (i.getValue().getJob().equals(jobName)) {
+                ids.add(i.getKey());
             }
         }
 
         for (Integer id: ids) {
             serventsJobsMap.remove(id);
+        }
+
+        for (Job job: systemActiveJobs) {
+            if (job.getName().equals(jobName)) {
+                systemActiveJobs.remove(job);
+                break;
+            }
         }
     }
 
@@ -159,7 +159,7 @@ public class SystemState {
         return executionJob;
     }
 
-    public void setExecutionJob(WorkingJobInstance executionJob) {
+    public void setWorkingJobInstance(WorkingJobInstance executionJob) {
         this.executionJob = executionJob;
     }
 

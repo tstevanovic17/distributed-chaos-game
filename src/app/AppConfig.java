@@ -55,9 +55,6 @@ public class AppConfig {
 	public static String BOOTSTRAP_IP_ADDRESS;
 	public static int BOOTSTRAP_PORT;
 
-	//todo trebace nam nesto nase umjesto cord state
-	//public static ChordState chordState;
-
 	/**
 	 * Reads a config file. Should be called once at start of app.
 	 * The config file should be of the following format:
@@ -135,17 +132,6 @@ public class AppConfig {
 			BOOTSTRAP_PORT = Integer.parseInt(properties.getProperty("bootstrap.port"));
 		} catch (NumberFormatException e) {
 			timestampedErrorPrint("Problem reading bootstrap_port. Exiting...");
-			System.exit(0);
-		}
-
-		try {
-			int weakFailureLimit = Integer.parseInt(properties.getProperty("weak_failure_limit"));
-			int strongFailureLimit = Integer.parseInt(properties.getProperty("strong_failure_limit"));
-
-			myServentInfo.setWeakFailureLimit(weakFailureLimit);
-			myServentInfo.setStrongFailureLimit(strongFailureLimit);
-		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading ip_address or port. Exiting...");
 			System.exit(0);
 		}
 

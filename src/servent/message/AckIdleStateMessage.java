@@ -1,10 +1,10 @@
 package servent.message;
 
-public class AckIdleMessage extends BasicMessage {
+public class AckIdleStateMessage extends BasicMessage {
 
     private static final long serialVersionUID = -1236109238293298393L;
 
-    public AckIdleMessage(
+    public AckIdleStateMessage(
             int senderPort,
             String senderIpAddress,
             int receiverPort,

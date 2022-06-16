@@ -89,7 +89,6 @@ public class JobScheduler {
                 }
             }
 
-            //smijemo li ovako fraktale
             //hocemo sivma da saljemo direkt poruku
             int serventId = AppConfig.systemState.getServentIdForFractal(new Fractal(fractals.get(i), job.getName()));
             ServentInfo receiverServent = AppConfig.systemState.getServentById(serventId);
@@ -131,7 +130,6 @@ public class JobScheduler {
         switch (scheduleReason) {
             //
             case NEW_JOB_ADDED:
-            case SERVENT_REMOVED:
 
                 for (String oldOne: oldFractals) {
                     if (newFractals.size() == 1) {   // only one servent is executing the job, map to all old ones
@@ -223,8 +221,6 @@ public class JobScheduler {
         AppConfig.timestampedStandardPrint(newJobs.toString());
 
         // map all old fractals to new ones
-        //why do we do this?
-        //to transver allready calculated values?
         //if jobs were allready running
 
         AppConfig.timestampedStandardPrint("Previous jobs:");
@@ -337,7 +333,6 @@ public class JobScheduler {
     public enum JobScheduleReason {
         NEW_JOB_ADDED,
         JOB_REMOVED,
-        NEW_SERVENT_ADDED,
-        SERVENT_REMOVED
+        NEW_SERVENT_ADDED
     }
 }

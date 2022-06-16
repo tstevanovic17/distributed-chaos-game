@@ -5,7 +5,7 @@ import app.JobScheduler;
 import app.model.Fractal;
 import app.model.Job;
 import app.model.ServentInfo;
-import servent.message.AckIdleMessage;
+import servent.message.AckIdleStateMessage;
 import servent.message.IdleStateMessage;
 import servent.message.Message;
 import servent.message.MessageType;
@@ -17,7 +17,6 @@ import java.util.Map;
 public class IdleStateHandler implements MessageHandler {
 
     private final Message clientMessage;
-    private IdleStateMessage idleMessage;
     private final Map<Integer, Fractal> serventJobsMap;
     private final Map<Fractal, Fractal> mappedFractalJobs;
     private final List<Job> activeJobs;
@@ -27,7 +26,7 @@ public class IdleStateHandler implements MessageHandler {
     public IdleStateHandler(Message clientMessage) {
         this.clientMessage = clientMessage;
 
-        idleMessage = (IdleStateMessage) clientMessage;
+        IdleStateMessage idleMessage = (IdleStateMessage) clientMessage;
         serventJobsMap = idleMessage.getServentJobsMap();
         mappedFractalJobs = idleMessage.getMappedFractalsJobs();
         activeJobs = idleMessage.getActiveJobs();
@@ -39,34 +38,34 @@ public class IdleStateHandler implements MessageHandler {
     public void run() {
         if (clientMessage.getMessageType() != MessageType.IDLE_STATE) {
             AppConfig.timestampedErrorPrint("Idle handler got a message that is not IDLE");
-            return;
+        } else {
+
+            AppConfig.systemState.setServentsJobsMap(serventJobsMap);
+
+            for (Job i : activeJobs) {
+                AppConfig.systemState.addJob(i);
+            }
+
+            AppConfig.systemState.resetAfterReceivedComputedPoints();
+            AppConfig.timestampedStandardPrint("I am idle");
+
+            //posalji moje podatke ako sam se izvrsavao
+            if (AppConfig.systemState.getExecutionJob() != null) {
+                ExecuteJobHandler.sendMyCalculatedData(mappedFractalJobs, scheduleType);
+                AppConfig.systemState.setWorkingJobInstance(null);
+            }
+
+            //posalji ack cvoru koji je zapoceo posao
+            ServentInfo intercessorServent = AppConfig.systemState.getServentById(jobSchedulerId);
+
+            AckIdleStateMessage ackIdleStateMessage = new AckIdleStateMessage(
+                    AppConfig.myServentInfo.getListenerPort(),
+                    AppConfig.myServentInfo.getIpAddress(),
+                    intercessorServent.getListenerPort(),
+                    intercessorServent.getIpAddress()
+            );
+            MessageUtil.sendMessage(ackIdleStateMessage);
         }
-
-        AppConfig.systemState.setServentsJobsMap(serventJobsMap);
-
-        for (Job i : activeJobs) {
-            AppConfig.systemState.addJob(i);
-        }
-
-        AppConfig.systemState.resetAfterReceivedComputedPoints();
-        AppConfig.timestampedStandardPrint("I am idle");
-
-        //posalji moje podatke ako sam se izvrsavao
-        if (AppConfig.systemState.getExecutionJob() != null) {
-            JobExecutionHandler.sendMyCurrentData(mappedFractalJobs, scheduleType);
-            AppConfig.systemState.setExecutionJob(null);
-        }
-
-        //posalji ack cvoru koji je zapoceo posao
-        ServentInfo intercessorServent = AppConfig.systemState.getServentById(jobSchedulerId);
-
-        AckIdleMessage ackIdleMessage = new AckIdleMessage(
-                AppConfig.myServentInfo.getListenerPort(),
-                AppConfig.myServentInfo.getIpAddress(),
-                intercessorServent.getListenerPort(),
-                intercessorServent.getIpAddress()
-        );
-        MessageUtil.sendMessage(ackIdleMessage);
     }
 
 }

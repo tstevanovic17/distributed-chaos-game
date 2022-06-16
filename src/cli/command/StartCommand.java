@@ -48,7 +48,7 @@ public class StartCommand implements CLICommand {
                     JobScheduler.JobScheduleReason.NEW_JOB_ADDED
             );
         } else {
-            //posao vec postoji u aktivnim poslovima
+            AppConfig.timestampedErrorPrint("Job is already in active jobs");
         }
 
     }

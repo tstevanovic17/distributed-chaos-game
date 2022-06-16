@@ -82,7 +82,7 @@ public class SimpleServentListener implements Runnable, Cancellable {
                     case POISON:
                         break;
                     case EXECUTE_JOB:
-                        messageHandler = new JobExecutionHandler(clientMessage);
+                        messageHandler = new ExecuteJobHandler(clientMessage);
                         break;
 					case COLLECT_JOB_RESULT:
 						messageHandler = new CollectJobResultHandler(clientMessage);
@@ -96,11 +96,11 @@ public class SimpleServentListener implements Runnable, Cancellable {
                     case IDLE_STATE:
                         messageHandler = new IdleStateHandler(clientMessage);
                         break;
-                    case COMPUTED_POINTS:
-                        messageHandler = new ComputedPointsHandler(clientMessage);
+                    case CURRENT_RESULT:
+                        messageHandler = new CurrentResultHandler(clientMessage);
                         break;
-					case JOB_SCHEDULE:
-						messageHandler = new JobScheduleHandler(clientMessage);
+					case RESCHEDULE_JOBS:
+						messageHandler = new RescheduleJobHandler(clientMessage);
 						break;
                     case ACK_IDLE_STATE:
                         messageHandler = new AckIdleHandler(clientMessage);

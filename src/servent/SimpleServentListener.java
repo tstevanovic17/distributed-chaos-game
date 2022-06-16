@@ -81,42 +81,27 @@ public class SimpleServentListener implements Runnable, Cancellable {
                         break;
                     case POISON:
                         break;
-/*					case QUIT:
-						messageHandler = new QuitHandler(clientMessage);
-						break;*/
                     case EXECUTE_JOB:
                         messageHandler = new JobExecutionHandler(clientMessage);
                         break;
-/*					case ASK_JOB_RESULT:
-						messageHandler = new AskJobResultHandler(clientMessage);
-						break;*/
-/*					case JOB_RESULT:
+					case COLLECT_JOB_RESULT:
+						messageHandler = new CollectJobResultHandler(clientMessage);
+						break;
+					case JOB_RESULT:
 						messageHandler = new JobResultHandler(clientMessage);
-						break;*/
-/*					case ASK_JOB_FRACTALID_RESULT:
-						messageHandler = new AskJobFractalIDResultHandler(clientMessage);
-						break;*/
-/*					case JOB_FRACTALID_RESULT:
-						messageHandler = new JobFractalIDResultHandler(clientMessage);
-						break;*/
-/*					case STOP_JOB:
+						break;
+					case STOP_JOB:
 						messageHandler = new StopJobHandler(clientMessage);
-						break;*/
-/*					case ASK_STATUS:
-						messageHandler = new AskStatusHandler(clientMessage);
-						break;*/
-/*					case TELL_STATUS:
-						messageHandler = new TellStatusHandler(clientMessage);
-						break;*/
+						break;
                     case IDLE_STATE:
                         messageHandler = new IdleStateHandler(clientMessage);
                         break;
                     case COMPUTED_POINTS:
                         messageHandler = new ComputedPointsHandler(clientMessage);
                         break;
-/*					case JOB_SCHEDULE:
+					case JOB_SCHEDULE:
 						messageHandler = new JobScheduleHandler(clientMessage);
-						break;*/
+						break;
                     case ACK_IDLE_STATE:
                         messageHandler = new AckIdleHandler(clientMessage);
                         break;

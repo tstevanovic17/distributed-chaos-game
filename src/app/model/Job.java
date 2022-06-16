@@ -59,4 +59,15 @@ public class Job implements Serializable {
         return Objects.hash(name);
     }
 
+    @Override
+    public String toString() {
+        return "Job{" +
+                "name='" + name + '\'' +
+                ", pointsCount=" + pointsCount +
+                ", proportion=" + proportion +
+                ", width=" + width +
+                ", height=" + height +
+                ", points=" + points +
+                '}';
+    }
 }

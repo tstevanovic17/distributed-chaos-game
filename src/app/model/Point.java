@@ -22,4 +22,11 @@ public class Point implements Serializable {
         return coordY;
     }
 
+    @Override
+    public String toString() {
+        return "Point{" +
+                "coordX=" + coordX +
+                ", coordY=" + coordY +
+                '}';
+    }
 }

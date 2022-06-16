@@ -42,14 +42,44 @@ public class SystemState {
         }
     }
 
+    //todo ovo se nedje duplo poziva
     public boolean addJob(Job newJob) {
         if(systemActiveJobs.contains(newJob)) {
-            AppConfig.timestampedErrorPrint("We have active job with the same name. Job not added");
             return false;
         } else {
             systemActiveJobs.add(newJob);
             return true;
         }
+    }
+
+    public void removeJob(String jobName) {
+        for (Job job: systemActiveJobs) {
+            if (job.getName().equals(jobName)) {
+                systemActiveJobs.remove(job);
+                break;
+            }
+        }
+
+        List<Integer> ids = new ArrayList<>();
+        for (Map.Entry<Integer, Fractal> entry: serventsJobsMap.entrySet()) {
+            if (entry.getValue().getJob().equals(jobName)) {
+                ids.add(entry.getKey());
+            }
+        }
+
+        for (Integer id: ids) {
+            serventsJobsMap.remove(id);
+        }
+    }
+
+    public List<Integer> getAllServentIdsForJob(String jobName) {
+        List<Integer> serventIdList = new ArrayList<>();
+        for (Map.Entry<Integer, Fractal> entry: serventsJobsMap.entrySet()) {
+            if (entry.getValue().getJob().equals(jobName)) {
+                serventIdList.add(entry.getKey());
+            }
+        }
+        return serventIdList;
     }
 
     public int getServentIdForFractal(Fractal fractal) {
@@ -92,7 +122,7 @@ public class SystemState {
     }
 
     public void setServentInfoMap(Map<Integer, ServentInfo> serventInfoMap) {
-        this.serventInfoMap = serventInfoMap;
+        this.serventInfoMap.putAll(serventInfoMap);
     }
 
     public List<Job> getSystemActiveJobs() {

@@ -1,19 +1,17 @@
 package cli.command;
 
 import app.AppConfig;
-import cli.CLIParser;
-import servent.SimpleServentListener;
+import app.JobScheduler;
+import app.model.Job;
+import app.model.ServentInfo;
+import servent.message.JobScheduleMessage;
+import servent.message.StopJobMessage;
+import servent.message.util.MessageUtil;
+
+import java.util.Map;
 
 public class StopCommand implements CLICommand {
 
-	private CLIParser parser;
-	private SimpleServentListener listener;
-	
-	public StopCommand(CLIParser parser, SimpleServentListener listener) {
-		this.parser = parser;
-		this.listener = listener;
-	}
-	
 	@Override
 	public String commandName() {
 		return "stop";
@@ -21,9 +19,50 @@ public class StopCommand implements CLICommand {
 
 	@Override
 	public void execute(String args) {
-		AppConfig.timestampedStandardPrint("Stopping...");
-		parser.stop();
-		listener.stop();
+
+		Job job = null;
+
+		for (Job i : AppConfig.systemState.getSystemActiveJobs()) {
+			if (i.getName().equals(args)) {
+				job = i;
+				break;
+			}
+		}
+
+		if (job != null) {
+
+			for(Map.Entry<Integer, ServentInfo> i : AppConfig.systemState.getServentInfoMap().entrySet()) {
+
+				ServentInfo currServent = AppConfig.systemState.getServentById(i.getKey());
+
+				StopJobMessage message = new StopJobMessage(
+						AppConfig.myServentInfo.getListenerPort(),
+						AppConfig.myServentInfo.getIpAddress(),
+						currServent.getListenerPort(),
+						currServent.getIpAddress(),
+						job.getName()
+				);
+				MessageUtil.sendMessage(message);
+
+			}
+
+			if (AppConfig.systemState.getSystemActiveJobs().size() > 0) {
+
+				AppConfig.timestampedStandardPrint("Rescheduling jobs");
+
+				JobScheduleMessage jsm = new JobScheduleMessage(
+						AppConfig.myServentInfo.getListenerPort(),
+						AppConfig.myServentInfo.getIpAddress(),
+						AppConfig.myServentInfo.getListenerPort(),
+						AppConfig.myServentInfo.getIpAddress(),
+						JobScheduler.JobScheduleReason.JOB_REMOVED
+				);
+			}
+
+		} else {
+			AppConfig.timestampedErrorPrint("Job not found.");
+		}
+
 	}
 
 }

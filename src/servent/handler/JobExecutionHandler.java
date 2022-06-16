@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class JobExecutionHandler implements MessageHandler {
-
     private final Message clientMessage;
-
     private final ExecuteJobMessage executeJobMessage;
     private final Fractal fractal;
     private final List<Point> pointList;
@@ -28,7 +26,6 @@ public class JobExecutionHandler implements MessageHandler {
 
     public JobExecutionHandler(Message clientMessage) {
         this.clientMessage = clientMessage;
-
         executeJobMessage = (ExecuteJobMessage) clientMessage;
         fractal = executeJobMessage.getFractal();
         pointList = executeJobMessage.getStartPoints();
@@ -51,9 +48,8 @@ public class JobExecutionHandler implements MessageHandler {
         AppConfig.timestampedStandardPrint("Job: " + job.getName());
         AppConfig.timestampedStandardPrint("Starting points: " + pointList.toString());
 
-        // no further splitting, job execution can start
 
-        // send ack to node which started job
+        //salje potvrdu čvoru koji je započeo posao
         ServentInfo schedulerServent = AppConfig.systemState.getServentById(jobSchedulerId);
 
         AckExecuteJobMessage ackExecuteJobMessage = new AckExecuteJobMessage(
@@ -72,7 +68,7 @@ public class JobExecutionHandler implements MessageHandler {
         boolean newJobOrServentRemoved = scheduleType.equals(JobScheduler.JobScheduleReason.NEW_JOB_ADDED) || scheduleType.equals(JobScheduler.JobScheduleReason.SERVENT_REMOVED);
 
         if (newJobOrServentRemoved) {
-            // compute how many data messages I need to receive from other servents
+            //racunanje koliko poruka sa podacima treba da dobijem od drugih servenata
             for (Map.Entry<Fractal, Fractal> entry : mappedFractalJobs.entrySet()) {
                 if (entry.getValue().equals(fractal)) {
                     AppConfig.systemState.getTotalPointMsgExpected().getAndIncrement();
@@ -82,9 +78,9 @@ public class JobExecutionHandler implements MessageHandler {
             AppConfig.systemState.getTotalPointMsgExpected().set(1);
         }
 
-        // wait for others to send me data
+       //cekaj dok mi drugi ne pošalju podatke
         int expectedMessagesCount = AppConfig.systemState.getTotalPointMsgExpected().get();
-        AppConfig.timestampedStandardPrint("Waiting for " + expectedMessagesCount + " servents to send me their computed points...");
+        AppConfig.timestampedStandardPrint("Waiting for " + expectedMessagesCount + " servents to send me their computed points");
 
         while (true) {
             if (AppConfig.systemState.getCalculatedPointsMsgCount().get() == expectedMessagesCount
@@ -93,7 +89,7 @@ public class JobExecutionHandler implements MessageHandler {
             }
         }
 
-        AppConfig.timestampedStandardPrint("All computed points received...");
+        AppConfig.timestampedStandardPrint("Received all computed points");
 
         AppConfig.systemState.addJob(job);
         WorkingJobInstance workingJobInstance = new WorkingJobInstance(
@@ -136,7 +132,7 @@ public class JobExecutionHandler implements MessageHandler {
         Thread jobExecutionThread = new Thread(workingJobInstance);
         jobExecutionThread.start();
 
-        // reset received data for next time
+        //resetovanje primljenih podataka za sledeci put
         AppConfig.systemState.resetAfterReceivedComputedPoints();
     }
 

@@ -10,7 +10,6 @@ import java.util.Map;
 public class UpdateMessage extends BasicMessage {
 
 	private static final long serialVersionUID = 3586102505319194978L;
-
 	private final Map<Integer, ServentInfo> serventInfoMap;
 	private final Map<Integer, Fractal> serventsJobsMap;
 	private final List<Job> jobs;

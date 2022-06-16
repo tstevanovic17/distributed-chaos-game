@@ -12,7 +12,7 @@ import java.util.*;
 
 public class JobScheduler {
 
-    //raspodjeljuje koliko ce kojem poslu da da cvorova
+    //respodeljuje koliko ce kojem poslu da da cvorova
     private static Map<Job, Integer> assignNumberOfServentsToJob(List<Job> jobs) {
         int numberOfServents = AppConfig.systemState.getServentInfoMap().size();
 
@@ -33,8 +33,7 @@ public class JobScheduler {
         return numberOfServantsPerJob;
     }
 
-    //kako najveci broj cvorova oprijedeljenih za posao da zaposli
-    //za pocetak razmatramo najvise dubinu 1
+    //kako najveci broj cvorova opredeljenih za posao da zaposli
     private static int distributeServantsForJob(int numberOfServents, int numberOfPoints) {
 
         if (numberOfPoints > numberOfServents) {
@@ -45,8 +44,7 @@ public class JobScheduler {
 
     }
 
-
-    //daje fraktalne ideve
+    //daje fraktalne id-ijeve
     private static List<String> generateFractalIdForJob(int numberOfServents) {
 
         List<String> fractals = new ArrayList<>();
@@ -59,8 +57,7 @@ public class JobScheduler {
 
     }
 
-
-    //dijeljenje regiona
+    //deljenje regiona
     public static void calculateRegionsAndSendMessages(
             List<Point> points,
             double factor,
@@ -87,8 +84,8 @@ public class JobScheduler {
                 }
             }
 
-            //smijemo li ovako fraktale
-            //hocemo sivma da saljemo direkt poruku
+
+            //hocemo sivma da posaljemo direkt poruku
             int serventId = AppConfig.systemState.getServentIdForFractal(new Fractal(fractals.get(i), job.getName()));
             ServentInfo receiverServent = AppConfig.systemState.getServentById(serventId);
 
@@ -117,7 +114,6 @@ public class JobScheduler {
 
     }
 
-
     private static Map<Fractal, Fractal> scheduleMap(
             List<String> oldFractals,
             List<String> newFractals,
@@ -132,7 +128,7 @@ public class JobScheduler {
             case SERVENT_REMOVED:
 
                 for (String oldOne: oldFractals) {
-                    if (newFractals.size() == 1) {   // only one servent is executing the job, map to all old ones
+                    if (newFractals.size() == 1) {   //samo jedan servent izvrsava posao
                         result.put(new Fractal(oldOne, jobName), new Fractal(newFractals.get(0), jobName));
                         continue;
                     }
@@ -179,35 +175,35 @@ public class JobScheduler {
 
     public static void scheduleJob(int serventCount, JobScheduleReason reason) {
 
-        AppConfig.timestampedStandardPrint("Job scheduling because of: " + reason);
+        AppConfig.timestampedStandardPrint("Razlog za raspodelu posla: " + reason);
 
         List<Job> activeJobs = AppConfig.systemState.getSystemActiveJobs();
         Map<Job, Integer> jobServentCount = assignNumberOfServentsToJob(activeJobs);
 
-        AppConfig.timestampedStandardPrint("Servent count for jobs:");
+        AppConfig.timestampedStandardPrint("Broj servenata za poslove: ");
         AppConfig.timestampedStandardPrint(String.valueOf(jobServentCount));
 
         List<Fractal> fractalList = new ArrayList<>();
         Map<Job, List<String>> jobFractalsMap = new HashMap<>();
         for (Map.Entry<Job, Integer> entry : jobServentCount.entrySet()) {
 
-            // compute number of servents needed to execute the job
+            //izracunavanje broja servenata potrebnih za izvrsavanje posla
             int distributedServentsNumber = distributeServantsForJob(entry.getValue(), entry.getKey().getPointsCount());
-            AppConfig.timestampedStandardPrint("Number of employed servents for job: " + entry.getKey().getName() + " : " + entry.getValue());
+            AppConfig.timestampedStandardPrint("Broj uposljenih servenata za posao: " + entry.getKey().getName() + " - " + entry.getValue());
 
-            // compute fractal ids for current job
+            //izracunavanje fraktalnih id-ijeva za trenutni posao
             List<String> fractalsForJob = generateFractalIdForJob(distributedServentsNumber);
-            AppConfig.timestampedStandardPrint("Fractals for job: " + entry.getKey().getName() + " : " + fractalsForJob);
+            AppConfig.timestampedStandardPrint("Fraktali za posao: " + entry.getKey().getName() + " - " + fractalsForJob);
             jobFractalsMap.put(entry.getKey(), fractalsForJob);
 
-            // add fractalIds and jobs
+            //dodavanje fraktalnih id-ijeva i poslova
             for (String fractalId : fractalsForJob) {
                 fractalList.add(new Fractal(fractalId, entry.getKey().getName()));
             }
         }
 
-        //razdaje fractalId-eve serventima redom, dok svaki fraktal id ne dodijeli nekom serventu.
-        // map id -> fractal -> job
+        //deli fractalId-eve serventima redom, sve dok svaki fraktal id ne dodeli nekom serventu
+        //map id -> fractal -> job
 
         Map<Integer, Fractal> newJobs = new HashMap<>();
         for (Map.Entry<Integer, ServentInfo> entry : AppConfig.systemState.getServentInfoMap().entrySet()) {
@@ -217,15 +213,13 @@ public class JobScheduler {
             }
         }
         AppConfig.systemState.setServentsJobsMap(newJobs);
-        AppConfig.timestampedStandardPrint("New jobs:");
+        AppConfig.timestampedStandardPrint("Novi poslovi:");
         AppConfig.timestampedStandardPrint(newJobs.toString());
 
-        // map all old fractals to new ones
-        //why do we do this?
-        //to transver allready calculated values?
-        //if jobs were allready running
 
-        AppConfig.timestampedStandardPrint("Previous jobs:");
+        //mapiranje stari fraktali sa novim fraktalima
+        //za prenos vec izracunatih vrednosti ako su poslovi vec bili pokrenuti
+        AppConfig.timestampedStandardPrint("Prethodni poslovi:");
         Map<Integer, Fractal> previousJobs = new HashMap<>(AppConfig.systemState.getServentsJobsMap());
         AppConfig.timestampedStandardPrint(previousJobs.toString());
 
@@ -244,17 +238,18 @@ public class JobScheduler {
             mappedFractals.putAll(currentMapped);
         }
 
-        AppConfig.timestampedStandardPrint("Job fractals map: \n" + jobFractalsMap);
+        AppConfig.timestampedStandardPrint("Mapa za poslove fraktala: \n" + jobFractalsMap);
 
         for (Map.Entry<Job, List<String>> entry: jobFractalsMap.entrySet()) {
             Job currentJob = entry.getKey();
             List<String> fractals = entry.getValue();
 
-            // compute initial job division and send messages
+            //izračunavanje pocetne podele posla i slanje poruke
             List<Point> jobPoints = currentJob.getPoints();
             double factor = currentJob.getProportion();
 
-            if (fractals.size() == 1) { // only one node is executing the job
+            //ako samo jedan čvor izvršava posao
+            if (fractals.size() == 1) {
                 int serventId = AppConfig.systemState.getServentIdForFractal(new Fractal(fractals.get(0), currentJob.getName()));
                 ServentInfo receiverServent = AppConfig.systemState.getServentById(serventId);
 
@@ -292,7 +287,7 @@ public class JobScheduler {
     }
 
     private static void notifyIdleServents(Map<Fractal, Fractal> mappedFractals, JobScheduleReason scheduleReason) {
-        // send to idle nodes that they are idle and new job division
+        // salje neaktivnim cvorovima da su neaktivni
         for (Map.Entry<Integer, ServentInfo> entry: AppConfig.systemState.getServentInfoMap().entrySet()) {
             int serventId = entry.getKey();
 
@@ -320,14 +315,13 @@ public class JobScheduler {
 
     private static void collectAckMessages(int serventCount) {
 
-        // wait for others to send ack job execution or ack idle messages
-        AppConfig.timestampedStandardPrint("collecting ack from servents...");
+       //cekamo da drugi posalju poruke o izvrsavanju posla ili potvrde u mirovanju        AppConfig.timestampedStandardPrint("collecting ack from servents...");
         while (true) {
             if (AppConfig.systemState.getAckMsgCount().get() == serventCount) {
                 break;
             }
         }
-        AppConfig.timestampedStandardPrint("all servents send ack...");
+        AppConfig.timestampedStandardPrint("Svi serventi su poslali ack...");
 
         AppConfig.systemState.getAckMsgCount().set(0);
     }

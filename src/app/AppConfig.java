@@ -27,7 +27,6 @@ public class AppConfig {
 	 * Convenience access for this servent's information
 	 */
 	public static ServentInfo myServentInfo;
-
 	//initialized in welcome message
 	public static SystemState systemState;
 

@@ -29,11 +29,11 @@ public class WelcomeHandler implements MessageHandler {
 
 			AppConfig.myServentInfo.setId(welcomeMsg.getNewServentId());
 
-			System.out.println("welcome poruku je dobio: "+AppConfig.myServentInfo.getId());
+			System.out.println("Welcome poruku je dobio: "+AppConfig.myServentInfo.getId());
 
 			AppConfig.systemState.initializeSystemState(AppConfig.myServentInfo);
 
-			System.out.println("update should be sent 1");
+			System.out.println("Update should be sent 1");
 
 			UpdateMessage updateMessage = new UpdateMessage(
 					AppConfig.myServentInfo.getListenerPort(),
@@ -46,11 +46,11 @@ public class WelcomeHandler implements MessageHandler {
 					true
 			);
 
-			System.out.println("update should be sent 2");
+			System.out.println("Update should be sent 2");
 
 			MessageUtil.sendMessage(updateMessage);
 
-			System.out.println("update should be sent 3");
+			System.out.println("Update should be sent 3");
 			
 		} else {
 			AppConfig.timestampedErrorPrint("Welcome handler got a message that is not WELCOME");

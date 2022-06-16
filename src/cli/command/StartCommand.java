@@ -30,7 +30,7 @@ public class StartCommand implements CLICommand {
         Job newJob = null;
 
         if (args == null) {
-            //unos posla iz konzole
+            //unos posla sa konzole
         } else {
             if(AppConfig.myServentInfo.getJobByName(args) != null) {
                 newJob = AppConfig.myServentInfo.getJobByName(args);
@@ -42,7 +42,7 @@ public class StartCommand implements CLICommand {
         }
 
         if(AppConfig.systemState.addJob(newJob)) {
-            //dodat posao u listu, pokrenuti raspodjelu poslova
+            //dodati posao u listu, pokrenuti raspodelu poslova
             JobScheduler.scheduleJob(
                     AppConfig.systemState.getServentInfoMap().size(),
                     JobScheduler.JobScheduleReason.NEW_JOB_ADDED

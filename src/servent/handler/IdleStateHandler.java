@@ -18,7 +18,6 @@ public class IdleStateHandler implements MessageHandler {
 
     private final Message clientMessage;
     private IdleStateMessage idleMessage;
-
     private final Map<Integer, Fractal> serventJobsMap;
     private final Map<Fractal, Fractal> mappedFractalJobs;
     private final List<Job> activeJobs;
@@ -50,14 +49,15 @@ public class IdleStateHandler implements MessageHandler {
         }
 
         AppConfig.systemState.resetAfterReceivedComputedPoints();
-        AppConfig.timestampedStandardPrint("I am idle...");
+        AppConfig.timestampedStandardPrint("I am idle");
 
-        if (AppConfig.systemState.getExecutionJob() != null) {   // send my data if I was executing
+        //posalji moje podatke ako sam se izvrsavao
+        if (AppConfig.systemState.getExecutionJob() != null) {
             JobExecutionHandler.sendMyCurrentData(mappedFractalJobs, scheduleType);
             AppConfig.systemState.setExecutionJob(null);
         }
 
-        // send ack to node which started job
+        //posalji ack cvoru koji je zapoceo posao
         ServentInfo intercessorServent = AppConfig.systemState.getServentById(jobSchedulerId);
 
         AckIdleMessage ackIdleMessage = new AckIdleMessage(

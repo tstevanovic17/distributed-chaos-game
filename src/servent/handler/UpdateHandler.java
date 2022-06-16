@@ -56,6 +56,8 @@ public class UpdateHandler implements MessageHandler {
                 AppConfig.systemState.setServentInfoMap(message.getServentInfoMap());
                 AppConfig.systemState.setServentsJobsMap(message.getServentsJobsMap());
 
+                /*
+
                 if (message.getJobs().size() > 0) {
                     AppConfig.timestampedStandardPrint("Rescheduling jobs");
 
@@ -69,6 +71,9 @@ public class UpdateHandler implements MessageHandler {
 
                     MessageUtil.sendMessage(jsm);
                 }
+
+
+                 */
             }
 
         } else {

@@ -216,6 +216,9 @@ public class JobScheduler {
                 break;
             }
         }
+
+        AppConfig.timestampedStandardPrint("Previous jobs:");
+        Map<Integer, Fractal> previousJobs = new HashMap<>(AppConfig.systemState.getServentsJobsMap());
         AppConfig.systemState.setServentsJobsMap(newJobs);
         AppConfig.timestampedStandardPrint("New jobs:");
         AppConfig.timestampedStandardPrint(newJobs.toString());
@@ -223,8 +226,6 @@ public class JobScheduler {
         // map all old fractals to new ones
         //if jobs were allready running
 
-        AppConfig.timestampedStandardPrint("Previous jobs:");
-        Map<Integer, Fractal> previousJobs = new HashMap<>(AppConfig.systemState.getServentsJobsMap());
         AppConfig.timestampedStandardPrint(previousJobs.toString());
 
         Map<Fractal, Fractal> mappedFractals = new HashMap<>();
@@ -294,7 +295,7 @@ public class JobScheduler {
         for (Map.Entry<Integer, ServentInfo> entry: AppConfig.systemState.getServentInfoMap().entrySet()) {
             int serventId = entry.getKey();
 
-            if (!AppConfig.systemState.getServentsJobsMap().containsKey(serventId)) {
+            if (AppConfig.systemState.getServentsJobsMap().containsKey(serventId)) {
                 continue;
             }
 

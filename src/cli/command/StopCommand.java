@@ -58,7 +58,7 @@ public class StopCommand implements CLICommand {
 						JobScheduler.JobScheduleReason.JOB_REMOVED
 				);
 
-				MessageUtil.sendMessage(jsm);
+				//MessageUtil.sendMessage(jsm);
 			}
 
 

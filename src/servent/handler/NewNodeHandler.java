@@ -35,7 +35,7 @@ public class NewNodeHandler implements MessageHandler {
 
 			MessageUtil.sendMessage(message);
 		} else {
-			AppConfig.timestampedErrorPrint("NEW_NODE handler got something that is not new node message.");
+			AppConfig.timestampedErrorPrint("New node handler got something that is not new node message.");
 		}
 
 	}

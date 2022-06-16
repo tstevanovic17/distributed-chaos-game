@@ -31,7 +31,7 @@ public class WorkingJobInstance implements Runnable, Cancellable {
 
     @Override
     public void run() {
-        AppConfig.timestampedStandardPrint("Computing points for \'" + jobName + "\'...");
+        AppConfig.timestampedStandardPrint("Racuna tacke za \'" + jobName + "\'.");
         while (working) {
             drawnPoints.add(calculatePoint());
             try {
@@ -45,7 +45,7 @@ public class WorkingJobInstance implements Runnable, Cancellable {
     @Override
     public void stop() {
         this.working = false;
-        AppConfig.timestampedStandardPrint("Stopped computing points for job \'" + jobName + "\'");
+        AppConfig.timestampedStandardPrint("Zaustavljeno racunanje tacaka za posao: \'" + jobName + "\'");
     }
 
     public String getJobName() {

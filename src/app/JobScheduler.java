@@ -12,7 +12,7 @@ import java.util.*;
 
 public class JobScheduler {
 
-    //raspodjeljuje koliko ce kojem poslu da da cvorova
+    //respodeljuje koliko ce kojem poslu da da cvorova
     private static Map<Job, Integer> assignNumberOfServentsToJob(List<Job> jobs) {
         int numberOfServents = AppConfig.systemState.getServentInfoMap().size();
 
@@ -75,7 +75,6 @@ public class JobScheduler {
 
         for (int i = 0; i<points.size(); i++) {
             List<Point> regionPoints = new ArrayList<>();
-
             Point fractalPoint = points.get(i);
 
             for (int j = 0; j < points.size(); j++) {
@@ -114,14 +113,13 @@ public class JobScheduler {
                     scheduleReason,
                     AppConfig.myServentInfo.getId()
             );
-
             MessageUtil.sendMessage(jobExecutionMessage);
 
         }
 
     }
 
-    //izmijeniti malo
+
     private static Map<Fractal, Fractal> scheduleMap(
             List<String> oldFractals,
             List<String> newFractals,
@@ -169,7 +167,7 @@ public class JobScheduler {
         return result;
     }
 
-    //todo promijeniti malo
+
     private static List<String> jobFractals(Map<Integer, Fractal> serventJobs, String jobName) {
         List<String> list = new ArrayList<>();
         for (Map.Entry<Integer, Fractal> entry: serventJobs.entrySet()) {
@@ -196,11 +194,7 @@ public class JobScheduler {
         for (Map.Entry<Job, Integer> entry : jobServentCount.entrySet()) {
 
             // compute number of servents needed to execute the job
-            int distributedServentsNumber = distributeServantsForJob(
-                    entry.getValue(),
-                    entry.getKey().getPointsCount()
-            );
-
+            int distributedServentsNumber = distributeServantsForJob(entry.getValue(), entry.getKey().getPointsCount());
             AppConfig.timestampedStandardPrint("Number of employed servents for job: " + entry.getKey().getName() + " : " + entry.getValue());
 
             // compute fractal ids for current job
@@ -214,12 +208,8 @@ public class JobScheduler {
             }
         }
 
-        System.out.println("Frctal list: " + fractalList);
-
         //razdaje fractalId-eve serventima redom, dok svaki fraktal id ne dodijeli nekom serventu.
         // map id -> fractal -> job
-
-        Map<Integer, Fractal> previousJobs = new HashMap<>(AppConfig.systemState.getServentsJobsMap());
 
         Map<Integer, Fractal> newJobs = new HashMap<>();
         for (Map.Entry<Integer, ServentInfo> entry : AppConfig.systemState.getServentInfoMap().entrySet()) {
@@ -229,7 +219,6 @@ public class JobScheduler {
             }
         }
         AppConfig.systemState.setServentsJobsMap(newJobs);
-
         AppConfig.timestampedStandardPrint("New jobs:");
         AppConfig.timestampedStandardPrint(newJobs.toString());
 
@@ -239,7 +228,7 @@ public class JobScheduler {
         //if jobs were allready running
 
         AppConfig.timestampedStandardPrint("Previous jobs:");
-
+        Map<Integer, Fractal> previousJobs = new HashMap<>(AppConfig.systemState.getServentsJobsMap());
         AppConfig.timestampedStandardPrint(previousJobs.toString());
 
         Map<Fractal, Fractal> mappedFractals = new HashMap<>();
@@ -309,7 +298,7 @@ public class JobScheduler {
         for (Map.Entry<Integer, ServentInfo> entry: AppConfig.systemState.getServentInfoMap().entrySet()) {
             int serventId = entry.getKey();
 
-            if (AppConfig.systemState.getServentsJobsMap().containsKey(serventId)) {
+            if (!AppConfig.systemState.getServentsJobsMap().containsKey(serventId)) {
                 continue;
             }
 

@@ -85,9 +85,9 @@ public class BootstrapServer {
 						String newServent = newServentIp + ":" + newServentPort;
 
 						AppConfig.timestampedStandardPrint("Adding: " + newServent);
-						activeServents.add(newServent); //first one doesn't need to confirm
+						activeServents.add(newServent);
 					} else {
-						// send last servent
+						//salje poslednje serventu
 						String lastServent = activeServents.get(activeServents.size() - 1);
 						socketWriter.write(lastServent + "\n");
 					}
